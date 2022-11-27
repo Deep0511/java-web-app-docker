@@ -20,7 +20,7 @@ stage ('Push To ECR') {
 stage ("Remove Local Image") {
 sh "docker rmi -f 623158369342.dkr.ecr.ap-south-1.amazonaws.com/java-web-application:${buildnumber}"
 }
-    stage ("update image tag) {
+    stage ("update image tag") {
            sh "sed -i 's/VERSION/${buildnumber}/g' docker-compose.yml"
            }
 stage("Deploy to ") {
