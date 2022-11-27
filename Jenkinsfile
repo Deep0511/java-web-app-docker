@@ -20,6 +20,9 @@ stage ('Push To ECR') {
 stage ("Remove Local Image") {
 sh "docker rmi -f 623158369342.dkr.ecr.ap-south-1.amazonaws.com/java-web-application:${buildnumber}"
 }
+    stage ("update image tag) {
+           sh "sed -i 's/VERSION/${buildnumber}'/g"
+           }
 stage("Deploy to ") {
 sshagent(['ssh-agent']) {
 sh 'scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@172.31.38.68:/home/ubuntu'
