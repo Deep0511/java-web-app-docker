@@ -1,40 +1,30 @@
-node{
-     
-    stage('SCM Checkout'){
-        git url: 'https://github.com/MithunTechnologiesDevOps/java-web-app-docker.git',branch: 'master'
-    }
-    
-    stage(" Maven Clean Package"){
-      def mavenHome =  tool name: "Maven-3.5.6", type: "maven"
-      def mavenCMD = "${mavenHome}/bin/mvn"
-      sh "${mavenCMD} clean package"
-      
-    } 
-    
-    
-    stage('Build Docker Image'){
-        sh 'docker build -t dockerhandson/java-web-app .'
-    }
-    
-    stage('Push Docker Image'){
-        withCredentials([string(credentialsId: 'Docker_Hub_Pwd', variable: 'Docker_Hub_Pwd')]) {
-          sh "docker login -u dockerhandson -p ${Docker_Hub_Pwd}"
-        }
-        sh 'docker push dockerhandson/java-web-app'
-     }
-     
-      stage('Run Docker Image In Dev Server'){
-        
-        def dockerRun = ' docker run  -d -p 8080:8080 --name java-web-app dockerhandson/java-web-app'
-         
-         sshagent(['DOCKER_SERVER']) {
-          sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.20.72 docker stop java-web-app || true'
-          sh 'ssh  ubuntu@172.31.20.72 docker rm java-web-app || true'
-          sh 'ssh  ubuntu@172.31.20.72 docker rmi -f  $(docker images -q) || true'
-          sh "ssh  ubuntu@172.31.20.72 ${dockerRun}"
-       }
-       
-    }
-     
-     
+node {
+    def mavenHome = tool name : "maven3.8.6"
+    def buildnumber = BUILD_NUMBER
+stage('CheckOut_Code') {
+  git credentialsId: '4735d413-1ac8-4b65-867c-23e03607e5d1', url: 'https://github.com/Deep0511/java-web-app-docker.git'    
+}    
+stage ('Build') {
+    sh "${mavenHome}/bin/mvn clean package"
+}    
+stage ('Build-Docker-Image') {
+    sh "docker build -t 623158369342.dkr.ecr.ap-south-1.amazonaws.com/java-web-application:${buildnumber} ."
 }
+stage ('Login to ECR') {
+    sh "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 623158369342.dkr.ecr.ap-south-1.amazonaws.com"
+}
+stage ('Push To ECR') {
+   sh "docker push 623158369342.dkr.ecr.ap-south-1.amazonaws.com/java-web-application:${buildnumber}"   
+}
+// Remove local image in Jenkins Server
+stage ("Remove Local Image") {
+sh "docker rmi -f 623158369342.dkr.ecr.ap-south-1.amazonaws.com/java-web-application:${buildnumber}"
+}
+stage("Deploy to ") {
+sshagent(['ssh-agent']) {
+sh "scp -o Strict HostKeyChecking=no docker-compose.yml ubuntu@172.31.38.68:/home/ubuntu"
+sh "ssh Strict HostKeyChecking=no ubuntu@172.31.38.68 docker-compose up -d"
+}
+}
+}
+
