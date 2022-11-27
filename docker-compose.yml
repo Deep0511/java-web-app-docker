@@ -1,6 +1,7 @@
 version: "3.1"
 services:
-  image: 623158369342.dkr.ecr.ap-south-1.amazonaws.com/java-web-app:VERSION
+ java-web-application:
+  image: 623158369342.dkr.ecr.ap-south-1.amazonaws.com/java-web-application:VERSION
   restart: always
   ports:
    - 9090:8080
