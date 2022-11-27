@@ -26,7 +26,7 @@ sh "docker rmi -f 623158369342.dkr.ecr.ap-south-1.amazonaws.com/java-web-applica
 stage("Deploy to ") {
 sshagent(['ssh-agent']) {
 sh 'scp -o StrictHostKeyChecking=no docker-compose.yml ubuntu@172.31.38.68:/home/ubuntu'
-sh "ssh StrictHostKeyChecking=no ubuntu@172.31.38.68 docker-compose up -d"
+sh "ssh -o StrictHostKeyChecking=no ubuntu@172.31.38.68 docker-compose up -d"
 }
 }
 }
