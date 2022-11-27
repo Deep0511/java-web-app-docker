@@ -1,11 +1,11 @@
 version: '3.1':VERSION
 services:
 springboot:
-image: dockerhandson/java-web-app
+image: 623158369342.dkr.ecr.ap-south-1.amazonaws.com/java-web-app
 restart: always
 ports:
 - 9090:8080
 networks:
 - javaappbridge
 networks:
-mavenappbridge:
+javaappbridge
